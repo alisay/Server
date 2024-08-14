@@ -35,7 +35,8 @@ public class DictionaryServer {
 				BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-				executeThread(i, in, out);
+//				executeThread(i, in, out);
+				executeThread(clientSocket, in, out);
 
 				clientSocket.close();
 
@@ -57,29 +58,35 @@ public class DictionaryServer {
 		}
 	}
 
-	private void logConnection(int clientNumber, int port, String hostname) {
+	private static void logConnection(int clientNumber, int port, String hostname) {
 		System.out.println("Client conection number " + clientNumber + " accepted:");
 		// System.out.println("Remote Port: " + clientSocket.getPort());
 		System.out.println("Remote Hostname: " + hostname);
 		System.out.println("Local Port: " + port);
 	}
 
-	private void executeThread(int clientNumber, BufferedReader inputStream, BufferedWriter outputStream)
-			throws IOException {
-		String clientMsg = null;
-		try {
-			while ((clientMsg = inputStream.readLine()) != null) {
-				System.out.println("Message from client " + clientNumber + ": " + clientMsg);
-				outputStream.write("Server Ack " + clientMsg + "\n");
-				outputStream.flush();
-				System.out.println("Response sent");
-			}
-			System.out.println("Server closed the client connection - received null");
-		}
+//	private void executeThread(int clientNumber, BufferedReader inputStream, BufferedWriter outputStream)
+//			throws IOException {
+//		String clientMsg = null;
+//		try {
+//			while ((clientMsg = inputStream.readLine()) != null) {
+//				System.out.println("Message from client " + clientNumber + ": " + clientMsg);
+//				outputStream.write("Server Ack " + clientMsg + "\n");
+//				outputStream.flush();
+//				System.out.println("Response sent");
+//			}
+//			System.out.println("Server closed the client connection - received null");
+//		}
+//
+//		catch (SocketException e) {
+//			System.out.println("closed...");
+//		}
+//	}
 
-		catch (SocketException e) {
-			System.out.println("closed...");
-		}
+	private static void executeThread(Socket clientSocket, BufferedReader in, BufferedWriter out) {
+		System.out.println("Assigning new thread for this client");
+		Thread t = new ClientHandler(clientSocket, in, out);
+
+		t.start();
 	}
-
 }
